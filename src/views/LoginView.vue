@@ -1,14 +1,20 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useTheme } from 'vuetify'
 
 const router = useRouter()
+const theme = useTheme()
 const form = ref(null)
-const email = ref('')
-const password = ref('')
+const email = ref(localStorage.getItem('admin-username') || '')
+const password = ref(localStorage.getItem('admin-password') || '')
 const loading = ref(false)
 
 const required = (value) => !!value || 'Field ini wajib diisi'
+
+onMounted(() => {
+  theme.global.name.value = 'adminTheme'
+})
 
 const login = async () => {
   const { valid } = await form.value.validate()
@@ -17,6 +23,9 @@ const login = async () => {
   loading.value = true
   window.setTimeout(() => {
     localStorage.setItem('admin-auth', 'true')
+    localStorage.setItem('admin-username', email.value)
+    localStorage.setItem('admin-password', password.value)
+    theme.global.name.value = localStorage.getItem('admin-theme') || 'adminTheme'
     router.push('/dashboard')
   }, 450)
 }
